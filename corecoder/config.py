@@ -9,6 +9,7 @@ def _load_dotenv():
     """Load .env from cwd, walking up to home dir. No-op if python-dotenv missing."""
     try:
         from dotenv import load_dotenv
+
         # search cwd first, then parent dirs up to ~
         env_path = Path(".env")
         if not env_path.exists():
@@ -27,7 +28,7 @@ def _load_dotenv():
 
 @dataclass
 class Config:
-    model: str = "gpt-4o"
+    model: str = "gemini-2.5-flash"
     api_key: str = ""
     base_url: str | None = None
     max_tokens: int = 4096
