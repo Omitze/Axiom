@@ -6,9 +6,8 @@ from unittest import mock
 
 import pytest
 
-from corecoder.llm import LLM, LiteLLM, LLMResponse, ToolCall
-from corecoder.config import Config
-
+from axiom.config import Config
+from axiom.llm import LLM, LiteLLM, LLMResponse, ToolCall
 
 # ---------------------------------------------------------------------------
 # Fake streaming response (matches OpenAI stream chunk format)
@@ -34,7 +33,11 @@ class _Usage:
 
 class _Chunk:
     def __init__(self, content=None, usage=None, tool_calls=None):
-        self.choices = [_Choice(_Delta(content=content, tool_calls=tool_calls))] if content or tool_calls else []
+        self.choices = (
+            [_Choice(_Delta(content=content, tool_calls=tool_calls))]
+            if content or tool_calls
+            else []
+        )
         self.usage = usage
 
 
@@ -59,9 +62,7 @@ def _install_fake_litellm(stream_contents=None):
     fake = builtin_types.ModuleType("litellm")
     if stream_contents is None:
         stream_contents = ["hello", " world"]
-    fake.completion = mock.MagicMock(
-        return_value=_make_stream(stream_contents)
-    )
+    fake.completion = mock.MagicMock(return_value=_make_stream(stream_contents))
     sys.modules["litellm"] = fake
     return fake
 
@@ -203,13 +204,16 @@ class TestConfigProvider:
         assert config.provider == "openai"
 
     def test_provider_from_env(self):
-        with mock.patch.dict("os.environ", {"CORECODER_PROVIDER": "litellm"}, clear=False):
+        with mock.patch.dict("os.environ", {"AXIOM_PROVIDER": "litellm"}, clear=False):
             config = Config.from_env()
             assert config.provider == "litellm"
 
     def test_cli_picks_litellm_class(self):
-        from corecoder.llm import LiteLLM
-        config = Config(provider="litellm", model="anthropic/claude-3-haiku", api_key="k")
+        from axiom.llm import LiteLLM
+
+        config = Config(
+            provider="litellm", model="anthropic/claude-3-haiku", api_key="k"
+        )
         llm_cls = LiteLLM if config.provider == "litellm" else LLM
         assert llm_cls is LiteLLM
 

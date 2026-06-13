@@ -3,14 +3,14 @@
 import os
 import pathlib
 
-from corecoder import Agent, LLM, Config, ALL_TOOLS, __version__
-from corecoder.context import ContextManager, estimate_tokens
-from corecoder.session import save_session, load_session, list_sessions
-from corecoder.tools import get_tool
+from axiom import ALL_TOOLS, LLM, Agent, Config, __version__
+from axiom.context import ContextManager, estimate_tokens
+from axiom.session import list_sessions, load_session, save_session
+from axiom.tools import get_tool
 
 
 def test_version():
-    assert __version__ == "0.3.0"
+    assert __version__ == "0.5.0"
 
 
 def test_public_api_exports():
@@ -18,20 +18,20 @@ def test_public_api_exports():
     assert Agent is not None
     assert LLM is not None
     assert Config is not None
-    assert len(ALL_TOOLS) == 7
+    assert len(ALL_TOOLS) == 8
 
 
 def test_config_from_env():
-    os.environ["CORECODER_MODEL"] = "test-model"
+    os.environ["AXIOM_MODEL"] = "test-model"
     c = Config.from_env()
     assert c.model == "test-model"
-    del os.environ["CORECODER_MODEL"]
+    del os.environ["AXIOM_MODEL"]
 
 
 def test_config_defaults():
     # temporarily clear relevant env vars
     saved = {}
-    for k in ["CORECODER_MODEL", "CORECODER_MAX_TOKENS"]:
+    for k in ["AXIOM_MODEL", "AXIOM_MAX_TOKENS"]:
         if k in os.environ:
             saved[k] = os.environ.pop(k)
 
@@ -44,6 +44,7 @@ def test_config_defaults():
 
 
 # --- Context ---
+
 
 def test_estimate_tokens():
     msgs = [{"role": "user", "content": "hello world"}]
@@ -78,6 +79,7 @@ def test_context_compress():
 
 # --- Session ---
 
+
 def test_session_save_load():
     msgs = [{"role": "user", "content": "test message"}]
     sid = save_session(msgs, "test-model", "pytest_test_session")
@@ -86,7 +88,7 @@ def test_session_save_load():
     assert loaded[0] == msgs
     assert loaded[1] == "test-model"
     # cleanup
-    pathlib.Path.home().joinpath(".corecoder/sessions/pytest_test_session.json").unlink()
+    pathlib.Path.home().joinpath(".axiom/sessions/pytest_test_session.json").unlink()
 
 
 def test_session_name_is_sanitized():
@@ -94,7 +96,7 @@ def test_session_name_is_sanitized():
     sid = save_session(msgs, "test-model", "../Research Notes!")
 
     assert sid == "Research-Notes"
-    path = pathlib.Path.home().joinpath(".corecoder/sessions/Research-Notes.json")
+    path = pathlib.Path.home().joinpath(".axiom/sessions/Research-Notes.json")
     assert path.exists()
     assert load_session("../Research Notes!") is not None
     path.unlink()
@@ -111,8 +113,10 @@ def test_list_sessions():
 
 # --- Cost estimation ---
 
+
 def test_cost_estimation_known_model():
-    from corecoder.llm import LLM
+    from axiom.llm import LLM
+
     llm = LLM.__new__(LLM)
     llm.model = "gpt-5.4"
     llm.total_prompt_tokens = 1_000_000
@@ -121,8 +125,10 @@ def test_cost_estimation_known_model():
     assert cost is not None
     assert cost == 2.5 + 7.5  # $2.5/M in + $15/M out * 0.5M
 
+
 def test_cost_estimation_unknown_model():
-    from corecoder.llm import LLM
+    from axiom.llm import LLM
+
     llm = LLM.__new__(LLM)
     llm.model = "some-custom-model"
     llm.total_prompt_tokens = 1000
@@ -132,8 +138,10 @@ def test_cost_estimation_unknown_model():
 
 # --- Changed files tracking ---
 
+
 def test_edit_tracks_changed_files(tmp_path):
-    from corecoder.tools.edit import _changed_files
+    from axiom.tools.edit import _changed_files
+
     _changed_files.clear()
     edit = get_tool("edit_file")
     path = tmp_path / "sample.py"
@@ -144,10 +152,14 @@ def test_edit_tracks_changed_files(tmp_path):
 
 
 def test_write_tracks_changed_files(tmp_path):
-    from corecoder.tools.edit import _changed_files
+    from axiom.tools.edit import _changed_files
+
     _changed_files.clear()
     write = get_tool("write_file")
     path = tmp_path / "tracked.txt"
     write.execute(file_path=str(path), content="tracked\n")
-    assert any("tracked" not in p and path.name in p for p in _changed_files) or len(_changed_files) > 0
+    assert (
+        any("tracked" not in p and path.name in p for p in _changed_files)
+        or len(_changed_files) > 0
+    )
     _changed_files.clear()

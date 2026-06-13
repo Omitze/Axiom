@@ -5,11 +5,11 @@ import sys
 import tempfile
 from pathlib import Path
 
-from corecoder.tools import ALL_TOOLS, get_tool
+from axiom.tools import ALL_TOOLS, get_tool
 
 
 def test_tool_count():
-    assert len(ALL_TOOLS) == 7
+    assert len(ALL_TOOLS) == 8
 
 
 def test_all_tools_have_valid_schema():
@@ -26,6 +26,7 @@ def test_all_tools_have_valid_schema():
 
 # --- bash ---
 
+
 def test_bash_basic():
     bash = get_tool("bash")
     assert "hello" in bash.execute(command="echo hello")
@@ -39,7 +40,9 @@ def test_bash_exit_code():
 
 def test_bash_timeout():
     bash = get_tool("bash")
-    r = bash.execute(command=f'"{sys.executable}" -c "import time; time.sleep(10)"', timeout=1)
+    r = bash.execute(
+        command=f'"{sys.executable}" -c "import time; time.sleep(10)"', timeout=1
+    )
     assert "timed out" in r
 
 
@@ -69,6 +72,7 @@ def test_bash_truncates_long_output():
 
 # --- read_file ---
 
+
 def test_read_file(tmp_path):
     read = get_tool("read_file")
     path = tmp_path / "sample.txt"
@@ -80,7 +84,7 @@ def test_read_file(tmp_path):
 
 def test_read_file_not_found():
     read = get_tool("read_file")
-    r = read.execute(file_path="/tmp/corecoder_nonexistent_file.txt")
+    r = read.execute(file_path="/tmp/axiom_nonexistent_file.txt")
     assert "not found" in r.lower() or "Error" in r
 
 
@@ -93,6 +97,7 @@ def test_read_file_offset_limit(tmp_path):
 
 
 # --- write_file ---
+
 
 def test_write_file():
     write = get_tool("write_file")
@@ -111,16 +116,20 @@ def test_write_file_creates_dirs():
     assert "Wrote" in r
     assert Path(nested).read_text() == "nested\n"
     import shutil
+
     shutil.rmtree(os.path.join(os.path.dirname(path), "sub"))
 
 
 # --- edit_file ---
 
+
 def test_edit_file_basic(tmp_path):
     edit = get_tool("edit_file")
     path = tmp_path / "sample.py"
     path.write_text("def foo():\n    return 42\n")
-    r = edit.execute(file_path=str(path), old_string="return 42", new_string="return 99")
+    r = edit.execute(
+        file_path=str(path), old_string="return 42", new_string="return 99"
+    )
     assert "Edited" in r
     assert "---" in r  # unified diff
     content = path.read_text()
@@ -146,6 +155,7 @@ def test_edit_file_duplicate_string(tmp_path):
 
 # --- glob ---
 
+
 def test_glob_finds_files():
     glob_t = get_tool("glob")
     r = glob_t.execute(pattern="*.py", path=os.path.dirname(__file__))
@@ -159,6 +169,7 @@ def test_glob_no_match():
 
 
 # --- grep ---
+
 
 def test_grep_finds_pattern():
     grep = get_tool("grep")
@@ -179,6 +190,7 @@ def test_grep_nonexistent_path():
 
 
 # --- agent tool ---
+
 
 def test_agent_tool_schema():
     agent_t = get_tool("agent")
