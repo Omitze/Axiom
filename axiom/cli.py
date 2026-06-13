@@ -14,7 +14,6 @@ from rich.panel import Panel
 from . import __version__
 from .agent import Agent
 from .config import Config
-from .goal import GoalJudgeEngine
 from .llm import LLM, LiteLLM
 from .session import list_sessions, load_session, save_session
 
@@ -73,11 +72,9 @@ def main():
         temperature=config.temperature,
         max_tokens=config.max_tokens,
     )
-    agent = Agent(llm=llm, max_context_tokens=config.max_context_tokens)
-
-    agent.goal_engine = GoalJudgeEngine(
-        llm_agent=llm,
-        llm_judge=None,  # same model by default; users can customise
+    agent = Agent(
+        llm=llm,
+        max_context_tokens=config.max_context_tokens,
         project_root=os.getcwd(),
     )
 

@@ -228,10 +228,10 @@ from axiom import Agent, LLM
 llm = LLM(model="kimi-k2.5", api_key="your-key", base_url="https://api.moonshot.ai/v1")
 agent = Agent(llm=llm)
 
-# Everything is wired up automatically:
-#   agent.memory_manager  — multi-layer memory
-#   agent.dream_engine    — consolidation + distillation
-#   agent.goal_engine     — set by CLI for /goal and /judge
+# All subsystems are auto-initialized:
+#   agent.memory_manager — multi-layer memory (auto-records conversations)
+#   agent.dream_engine   — consolidation + distillation (auto-triggered)
+#   agent.goal_engine    — goal & judge for /goal and /judge
 
 response = agent.chat("find all TODO comments and list them")
 ```

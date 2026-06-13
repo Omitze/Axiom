@@ -229,9 +229,9 @@ llm = LLM(model="kimi-k2.5", api_key="your-key", base_url="https://api.moonshot.
 agent = Agent(llm=llm)
 
 # 所有子系统自动初始化：
-#   agent.memory_manager  — 多层记忆
-#   agent.dream_engine    — 巩固 + 蒸馏
-#   agent.goal_engine     — 由 CLI 设置，用于 /goal 和 /judge
+#   agent.memory_manager — 多层记忆（自动录制对话）
+#   agent.dream_engine   — 巩固 + 蒸馏（自动触发）
+#   agent.goal_engine    — 目标 & 裁判，用于 /goal 和 /judge
 
 response = agent.chat("找出项目里所有 TODO 注释并列出来")
 ```

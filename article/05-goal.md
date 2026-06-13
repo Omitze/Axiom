@@ -129,7 +129,7 @@ class JudgeVerdict:
 
 **文件**：`goal/__init__.py`
 
-**构造要求**：需要两个独立的 LLM 实例 — `llm_agent`（用于目标精炼）和 `llm_judge`（用于评判），以保持 Actor-Critic 分离。
+**构造要求**：可以由 Agent 构造器自动初始化（传入单个 LLM 实例），或由用户手动传入两个独立的 LLM 实例 — `llm_agent`（用于目标精炼）和 `llm_judge`（用于评判），以保持 Actor-Critic 分离。
 
 | 方法 | 作用 |
 |------|------|

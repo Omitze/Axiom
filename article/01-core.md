@@ -12,25 +12,29 @@
 
 | 方法 | 作用 |
 |------|------|
-| `chat(user_input, on_token, on_tool)` | 主循环。将用户输入追加到消息列表，调用上下文压缩，然后反复调用 LLM：若 LLM 返回工具调用则执行并回传结果，若返回文本则返回给调用方 |
+| `chat(user_input, on_token, on_tool)` | 主循环。将用户输入追加到消息列表，自动写入记忆，调用上下文压缩，然后反复调用 LLM：若 LLM 返回工具调用则执行并回传结果，若返回文本则记录到记忆后返回给调用方 |
 | `_exec_tool(tc)` | 根据工具名分发单个工具调用，优雅处理异常 |
 | `_exec_tools_parallel(tool_calls, on_tool)` | 使用 `ThreadPoolExecutor` 并发执行多个独立工具调用（最多 8 线程） |
+| `_record_user_input(user_input)` | 将用户输入自动记录为情节性记忆（episodic），跳过短输入和 `/` 命令 |
+| `_record_assistant_response(content)` | 将助手回复的前 500 字符自动记录为情节性记忆 |
+| `_record_tool_pattern(tool_names)` | 将 ≥3 步的工具调用序列自动记录为程序性记忆（procedural），带去重 |
+| `_maybe_auto_dream()` | 检查 AutoTrigger 条件，自动触发 dream 记忆巩固 |
 | `reset()` | 清空对话历史 |
 
 ### 数据流
 
 ```
-用户输入 → ContextManager.maybe_compress() → LLM.chat() → 
+用户输入 → 记录为情节性记忆 → ContextManager.maybe_compress() → LLM.chat() → 
   ├─ 工具调用 → 执行（可并行）→ 追加上下文 → 再次调用 LLM
-  └─ 文本回复 → 返回给调用方
+  └─ 文本回复 → 记录为情节性记忆 → 记录工具调用模式 → 检查自动 Dream → 返回给调用方
 ```
 
 ### 子系统集成
 
-Agent 通过惰性加载（lazy import）集成可选子系统：
-- `MemoryManager` — 记忆系统
-- `DreamDistillEngine` — 梦与蒸馏
-- `GoalJudgeEngine` — 目标评判
+Agent 通过惰性加载（lazy import）集成所有子系统：
+- `MemoryManager` — 记忆系统，自动记录对话及工具调用模式
+- `DreamDistillEngine` — 梦与蒸馏，每次 chat 结束时自动检查触发条件
+- `GoalJudgeEngine` — 目标评判，由 Agent 构造器自动初始化
 - `SkillLoader` — 技能加载
 
 ---
@@ -44,7 +48,7 @@ Agent 通过惰性加载（lazy import）集成可选子系统：
 | 函数 | 作用 |
 |------|------|
 | `_parse_args()` | 使用 argparse 解析命令行参数：`--model`、`--base-url`、`--api-key`、`--prompt`、`--resume`、`--version` |
-| `main()` | 从环境变量加载配置，可选覆盖为 CLI 参数，创建 LLM 客户端和 Agent，挂载 GoalJudgeEngine，处理会话恢复，然后分发到一次性执行或 REPL |
+| `main()` | 从环境变量加载配置，可选覆盖为 CLI 参数，创建 LLM 客户端和 Agent（Agent 自动初始化所有子系统），处理会话恢复，然后分发到一次性执行或 REPL |
 | `_run_once(agent, prompt)` | 非交互模式：执行单次提示词并流式输出 token |
 | `_repl(agent, config)` | 交互模式：基于 readline 的循环，支持丰富的控制台 I/O |
 
