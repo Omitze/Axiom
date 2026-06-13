@@ -10,7 +10,7 @@
 flowchart TB
     subgraph 三层加载源
         B[builtin/<br/>内置技能]
-        U[~/.corecoder/skills/<br/>用户技能]
+        U[~/.axiom/skills/<br/>用户技能]
         E[entry-points<br/>pip 包注册]
     end
     
@@ -63,8 +63,8 @@ class SkillValidationError(SkillError): ...   # 技能验证失败
 | 来源 | 位置 | 说明 |
 |------|------|------|
 | **内置** | `skills/builtin/` | 随 Axiom 发布的官方技能 |
-| **用户** | `~/.corecoder/skills/` | 用户自行安装或编写的技能 |
-| **入口点** | pip 包的 `corecoder.skills` entry-points | 通过 pip 安装的第三方技能包 |
+| **用户** | `~/.axiom/skills/` | 用户自行安装或编写的技能 |
+| **入口点** | pip 包的 `axiom.skills` entry-points | 通过 pip 安装的第三方技能包 |
 
 ### `SkillLoader` 核心方法
 
@@ -196,7 +196,7 @@ sequenceDiagram
         G-->>SL: Tool 实例
         SL->>SR: register(tool, "builtin")
     and 用户技能
-        SL->>FS: 扫描 ~/.corecoder/skills/
+        SL->>FS: 扫描 ~/.axiom/skills/
         FS-->>SL: 文件列表
         SL->>SL: importlib 加载每个文件
         SL->>G: 调用 create_tool()

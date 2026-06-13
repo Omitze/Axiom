@@ -4,8 +4,6 @@
 
 **Axiom** 是一个基于大语言模型（LLM）的智能编码助手代理系统，其设计受 Claude Code 启发，采用 **Agent Loop (代理循环)** 架构 —— 用户输入自然语言指令，LLM 自主决定调用何种工具来完成任务，并在多轮交互中持续迭代。
 
-> 注：Axiom 是在 [CoreCoder](https://github.com/he-yufeng/CoreCoder) 基础上的全面重构，CoreCoder 的环境变量名（`CORECODER_*`）已被统一为 `AXIOM_*`。
-
 ---
 
 ## 架构全景图
@@ -111,9 +109,9 @@ sequenceDiagram
 
 ---
 
-## 命名渊源
+## 更名说明
 
-模块内部大量引用 `corecoder` 这一名称（如配置项 `CORECODER_API_KEY`），表明该项目的前身名为 **CoreCoder**。当前代码库的顶层包名为 **Axiom**，但内部结构仍保留了历史命名痕迹。
+本项目的前身名为 **CoreCoder**，在全面重构为 **Axiom** 时，所有环境变量名（`CORECODER_*`）已统一为 `AXIOM_*`，内部路径也已更新为 `~/.axiom/`。代码中已无 `corecoder` 遗留引用。
 
 ---
 
