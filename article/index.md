@@ -109,12 +109,6 @@ sequenceDiagram
 
 ---
 
-## 更名说明
-
-本项目的前身名为 **CoreCoder**，在全面重构为 **Axiom** 时，所有环境变量名（`CORECODER_*`）已统一为 `AXIOM_*`，内部路径也已更新为 `~/.axiom/`。代码中已无 `corecoder` 遗留引用。
-
----
-
 ## 下一步
 
 请通过以下文档深入了解每个模块：
