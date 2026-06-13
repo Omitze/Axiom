@@ -85,20 +85,45 @@ flowchart TD
 
 ## 安装
 
+### 方式一：Conda（推荐）
+
 ```bash
-pip install axiom
+# 克隆仓库
+git clone https://github.com/YOUR_USERNAME/axiom.git
+cd axiom
+
+# 使用 environment.yml 创建环境（精确版本锁定）
+conda env create -f environment.yml
+
+# 或者使用 requirements_conda.txt 创建
+conda create --name axiom --file requirements_conda.txt
+
+# 激活环境
+conda activate axiom
 ```
+
+### 方式二：最小化环境
+
+如果你希望更简洁、跨平台，可以创建一个最小 conda 环境，然后安装核心依赖：
+
+```bash
+conda create -n axiom python=3.11
+conda activate axiom
+pip install openai httpx pydantic python-dotenv rich tqdm ipykernel
+```
+
+---
 
 选你的模型，任何 OpenAI 兼容 API 都行：
 
 ```bash
 # Kimi K2.5
 export OPENAI_API_KEY=你的key OPENAI_BASE_URL=https://api.moonshot.ai/v1
-axiom -m kimi-k2.5
+python -m axiom.cli -m kimi-k2.5
 
 # Claude（通过 OpenRouter）
 export OPENAI_API_KEY=你的key OPENAI_BASE_URL=https://openrouter.ai/api/v1
-axiom -m anthropic/claude-opus-4-6
+python -m axiom.cli -m anthropic/claude-opus-4-6
 
 # DeepSeek / Qwen / Ollama … 任何 OpenAI 兼容的 API
 ```

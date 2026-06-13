@@ -85,20 +85,45 @@ flowchart TD
 
 ## Install
 
+### Option 1: Conda (recommended)
+
 ```bash
-pip install axiom
+# Clone the repository
+git clone https://github.com/YOUR_USERNAME/axiom.git
+cd axiom
+
+# Create environment from environment.yml (exact version lock)
+conda env create -f environment.yml
+
+# Or alternatively from requirements_conda.txt
+conda create --name axiom --file requirements_conda.txt
+
+# Activate it
+conda activate axiom
 ```
+
+### Option 2: Minimal environment (from history)
+
+If you prefer a cleaner, platform-agnostic setup, create a minimal conda environment first, then install the core dependencies:
+
+```bash
+conda create -n axiom python=3.11
+conda activate axiom
+pip install openai httpx pydantic python-dotenv rich tqdm ipykernel
+```
+
+---
 
 Pick your model — any OpenAI-compatible API works:
 
 ```bash
 # Kimi K2.5
 export OPENAI_API_KEY=your-key OPENAI_BASE_URL=https://api.moonshot.ai/v1
-axiom -m kimi-k2.5
+python -m axiom.cli -m kimi-k2.5
 
 # Claude (via OpenRouter)
 export OPENAI_API_KEY=your-key OPENAI_BASE_URL=https://openrouter.ai/api/v1
-axiom -m anthropic/claude-opus-4-6
+python -m axiom.cli -m anthropic/claude-opus-4-6
 
 # DeepSeek / Qwen / Ollama … same as any OpenAI-compatible endpoint
 ```
