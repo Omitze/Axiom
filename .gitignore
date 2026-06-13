@@ -17,3 +17,4 @@ dist/
 .pytest_cache/
 .tmp/
 zed.md
+tmp.*
