@@ -66,18 +66,18 @@ Unlike a simple request-response agent, Axiom implements a **closed cognitive lo
 
 ```mermaid
 flowchart TD
-    A[User Request] --> B[Agent Loop<br/>tools + LLM]
-    B --> C{Goal & Judge<br/>/judge}
-    C -- unmet --> B
-    C -- met --> D[Memory<br/>/memory → store patterns]
-    D --> E{/dream triggers?}
-    E -- yes --> F[Memory Consolidation<br/>merge + strengthen + archive]
-    E -- no --> G{/distill triggers?}
-    G -- yes --> H[Workflow Mining<br/>PrefixSpan → SkillPackager]
-    G -- no --> A
-    H --> I{Confidence?}
-    I -- high --> J[Auto-generate Skill]
-    I -- medium --> K[User approve<br/>/distill approve]
+    A["User Request"] --> B["Agent Loop (tools + LLM)"]
+    B --> C{"Goal & Judge (/judge)"}
+    C -- "unmet" --> B
+    C -- "met" --> D["Memory (/memory -> store patterns)"]
+    D --> E{"/dream triggers?"}
+    E -- "yes" --> F["Memory Consolidation (merge + strengthen + archive)"]
+    E -- "no" --> G{"/distill triggers?"}
+    G -- "yes" --> H["Workflow Mining (PrefixSpan -> SkillPackager)"]
+    G -- "no" --> A
+    H --> I{"Confidence?"}
+    I -- "high" --> J["Auto-generate Skill"]
+    I -- "medium" --> K["User approve (/distill approve)"]
     K --> J
     J --> A
     F --> A
